@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Skills Dictionary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 50px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .search-box input::placeholder {
+            color: #999;
+        }
+
+        .search-icon {
+            color: #667eea;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .skill-card.hidden {
+            display: none;
+        }
+
+        .skill-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-right: 12px;
+        }
+
+        .skill-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #2d3748;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .skill-description {
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            background: #f7fafc;
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 40px;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Developer Skills Dictionary</h1>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search skills, technologies, or keywords...">
+        </div>
+
+        <div class="category-filter">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="frontend">Frontend</button>
+            <button class="filter-btn" data-category="backend">Backend</button>
+            <button class="filter-btn" data-category="database">Database</button>
+            <button class="filter-btn" data-category="devops">DevOps</button>
+            <button class="filter-btn" data-category="soft">Soft Skills</button>
+        </div>
+
+        <div class="skills-grid" id="skillsGrid"></div>
+        
+        <div class="no-results" id="noResults">
+            No skills found. Try a different search term.
+        </div>
+    </div>
+
+    <script>
+        const skills = [
+            {
+                category: 'frontend',
+                title: 'React',
+                icon: '⚛️',
+                color: '#61dafb',
+                description: 'A JavaScript library for building user interfaces with component-based architecture and virtual DOM for optimal performance.',
+                tags: ['JavaScript', 'UI', 'SPA', 'JSX']
+            },
+            {
+                category: 'frontend',
+                title: 'Vue.js',
+                icon: '💚',
+                color: '#42b883',
+                description: 'Progressive JavaScript framework for building user interfaces with reactive data binding and composable components.',
+                tags: ['JavaScript', 'Progressive', 'Reactive', 'Components']
+            },
+            {
+                category: 'frontend',
+                title: 'Angular',
+                icon: '🅰️',
+                color: '#dd0031',
+                description: 'TypeScript-based framework for building scalable web applications with dependency injection and comprehensive tooling.',
+                tags: ['TypeScript', 'MVC', 'Enterprise', 'CLI']
+            },
+            {
+                category: 'frontend',
+                title: 'HTML/CSS',
+                icon: '🎨',
+                color: '#e34c26',
+                description: 'Foundational web technologies for structuring content and styling web pages with modern responsive design patterns.',
+                tags: ['Markup', 'Styling', 'Responsive', 'Flexbox', 'Grid']
+            },
+            {
+                category: 'frontend',
+                title: 'JavaScript',
+                icon: '⚡',
+                color: '#f7df1e',
+                description: 'Core programming language of the web for creating interactive and dynamic user experiences across browsers.',
+                tags: ['ES6+', 'Async', 'DOM', 'Events']
+            },
+            {
+                category: 'backend',
+                title: 'Node.js',
+                icon: '🟢',
+                color: '#339933',
+                description: 'JavaScript runtime built on Chrome V8 engine for building fast, scalable server-side and networking applications.',
+                tags: ['JavaScript', 'Event-driven', 'Non-blocking', 'NPM']
+            },
+            {
+                category: 'backend',
+                title: 'Python',
+                icon: '🐍',
+                color: '#3776ab',
+                description: 'High-level programming language known for readability and versatility in web development, data science, and automation.',
+                tags: ['Django', 'Flask', 'FastAPI', 'Scripts']
+            },
+            {
+                category: 'backend',
+                title: 'Java',
+                icon: '☕',
+                color: '#007396',
+                description: 'Object-oriented programming language for building enterprise-grade applications with strong typing and portability.',
+                tags: ['Spring', 'JVM', 'OOP', 'Enterprise']
+            },
+            {
+                category: 'database',
+                title: 'PostgreSQL',
+                icon: '🐘',
+                color: '#336791',
+                description: 'Advanced open-source relational database with strong ACID compliance, extensibility, and complex query support.',
+                tags: ['SQL', 'ACID', 'Relational', 'JSONB']
+            },
+            {
+                category: 'database',
+                title: 'MySQL',
+                icon: '🐬',
+                color: '#4479a1',
+                description: 'Popular open-source relational database management system known for reliability, ease of use, and performance.',
+                tags: ['SQL', 'Relational', 'LAMP', 'InnoDB']
+            },
+            {
+                category: 'database',
+                title: 'MongoDB',
+                icon: '🍃',
+                color: '#47a248',
+                description: 'NoSQL document database offering high performance, high availability, and easy scalability with flexible schemas.',
+                tags: ['NoSQL', 'Document', 'JSON', 'Scalable']
+            },
+            {
+                category: 'backend',
+                title: 'RESTful APIs',
+                icon: '🔌',
+                color: '#ff6c37',
+                description: 'Architectural style for designing networked applications using HTTP methods and stateless client-server communication.',
+                tags: ['HTTP', 'REST', 'JSON', 'Stateless']
+            },
+            {
+                category: 'backend',
+                title: 'Microservices',
+                icon: '🧩',
+                color: '#00897b',
+                description: 'Architectural approach structuring applications as collection of loosely coupled, independently deployable services.',
+                tags: ['Architecture', 'Scalable', 'Distributed', 'API Gateway']
+            },
+            {
+                category: 'devops',
+                title: 'AWS',
+                icon: '☁️',
+                color: '#ff9900',
+                description: 'Amazon Web Services cloud platform offering compute power, database storage, and content delivery services globally.',
+                tags: ['Cloud', 'EC2', 'S3', 'Lambda']
+            },
+            {
+                category: 'devops',
+                title: 'Azure',
+                icon: '☁️',
+                color: '#0078d4',
+                description: 'Microsoft cloud computing platform for building, testing, deploying, and managing applications and services.',
+                tags: ['Cloud', 'Microsoft', 'DevOps', 'Enterprise']
+            },
+            {
+                category: 'devops',
+                title: 'Git',
+                icon: '📦',
+                color: '#f05032',
+                description: 'Distributed version control system for tracking changes in source code during software development collaboration.',
+                tags: ['VCS', 'GitHub', 'GitLab', 'Branching']
+            },
+            {
+                category: 'devops',
+                title: 'Docker',
+                icon: '🐳',
+                color: '#2496ed',
+                description: 'Platform for developing, shipping, and running applications in isolated containers for consistent environments.',
+                tags: ['Containers', 'Virtualization', 'DevOps', 'Images']
+            },
+            {
+                category: 'devops',
+                title: 'CI/CD',
+                icon: '🔄',
+                color: '#239120',
+                description: 'Continuous Integration and Deployment practices automating code integration, testing, and production releases.',
+                tags: ['Automation', 'Testing', 'Pipeline', 'Deployment']
+            },
+            {
+                category: 'devops',
+                title: 'Jenkins',
+                icon: '🔧',
+                color: '#d24939',
+                description: 'Open-source automation server enabling continuous integration and continuous delivery of software projects.',
+                tags: ['CI/CD', 'Automation', 'Pipeline', 'Build']
+            },
+            {
+                category: 'backend',
+                title: 'Security (OWASP)',
+                icon: '🔒',
+                color: '#000000',
+                description: 'Application security best practices following OWASP guidelines to prevent common vulnerabilities and attacks.',
+                tags: ['Security', 'OWASP Top 10', 'XSS', 'SQL Injection']
+            },
+            {
+                category: 'backend',
+                title: 'Secure Coding',
+                icon: '🛡️',
+                color: '#00695c',
+                description: 'Development practices focusing on writing code resistant to security vulnerabilities and malicious attacks.',
+                tags: ['Security', 'Best Practices', 'Validation', 'Encryption']
+            },
+            {
+                category: 'soft',
+                title: 'Problem-Solving',
+                icon: '🧠',
+                color: '#9c27b0',
+                description: 'Critical thinking and analytical skills to identify issues, evaluate solutions, and implement effective fixes.',
+                tags: ['Critical Thinking', 'Debugging', 'Algorithm', 'Logic']
+            },
+            {
+                category: 'soft',
+                title: 'Communication',
+                icon: '💬',
+                color: '#2196f3',
+                description: 'Ability to articulate technical concepts clearly to both technical and non-technical stakeholders effectively.',
+                tags: ['Teamwork', 'Documentation', 'Presentation', 'Collaboration']
+            },
+            {
+                category: 'frontend',
+                title: 'TypeScript',
+                icon: '📘',
+                color: '#3178c6',
+                description: 'Strongly typed superset of JavaScript that compiles to plain JavaScript, enhancing code quality and maintainability.',
+                tags: ['JavaScript', 'Types', 'Static Analysis', 'OOP']
+            },
+            {
+                category: 'frontend',
+                title: 'Tailwind CSS',
+                icon: '🎨',
+                color: '#06b6d4',
+                description: 'Utility-first CSS framework for rapidly building custom user interfaces with pre-defined classes.',
+                tags: ['CSS', 'Utility', 'Responsive', 'Modern']
+            },
+            {
+                category: 'frontend',
+                title: 'Webpack',
+                icon: '📦',
+                color: '#8dd6f9',
+                description: 'Module bundler for JavaScript applications, managing dependencies and optimizing assets for production.',
+                tags: ['Bundler', 'Build Tool', 'Optimization', 'Modules']
+            },
+            {
+                category: 'frontend',
+                title: 'Redux',
+                icon: '💜',
+                color: '#764abc',
+                description: 'Predictable state container for JavaScript apps, managing application state with a single source of truth.',
+                tags: ['State Management', 'React', 'Flux', 'Middleware']
+            },
+            {
+                category: 'backend',
+                title: 'GraphQL',
+                icon: '🔷',
+                color: '#e10098',
+                description: 'Query language for APIs providing flexible, efficient data fetching with strongly typed schemas.',
+                tags: ['API', 'Query', 'Schema', 'Type-safe']
+            },
+            {
+                category: 'backend',
+                title: 'Express.js',
+                icon: '🚂',
+                color: '#000000',
+                description: 'Minimal and flexible Node.js web application framework providing robust features for web and mobile applications.',
+                tags: ['Node.js', 'Web Framework', 'Middleware', 'REST']
+            },
+            {
+                category: 'backend',
+                title: 'Django',
+                icon: '🎸',
+                color: '#092e20',
+                description: 'High-level Python web framework encouraging rapid development and clean, pragmatic design with batteries included.',
+                tags: ['Python', 'MVC', 'ORM', 'Full-stack']
+            },
+            {
+                category: 'backend',
+                title: 'Ruby on Rails',
+                icon: '💎',
+                color: '#cc0000',
+                description: 'Server-side web application framework written in Ruby, emphasizing convention over configuration.',
+                tags: ['Ruby', 'MVC', 'Active Record', 'Full-stack']
+            },
+            {
+                category: 'backend',
+                title: 'PHP',
+                icon: '🐘',
+                color: '#777bb4',
+                description: 'Server-side scripting language designed for web development, powering millions of websites and applications.',
+                tags: ['Laravel', 'WordPress', 'Symfony', 'Web']
+            },
+            {
+                category: 'database',
+                title: 'Redis',
+                icon: '🔴',
+                color: '#dc382d',
+                description: 'In-memory data structure store used as database, cache, and message broker with high performance.',
+                tags: ['Cache', 'NoSQL', 'Key-Value', 'In-memory']
+            },
+            {
+                category: 'database',
+                title: 'Elasticsearch',
+                icon: '🔍',
+                color: '#005571',
+                description: 'Distributed search and analytics engine for all types of data with near real-time search capabilities.',
+                tags: ['Search', 'NoSQL', 'Analytics', 'Full-text']
+            },
+            {
+                category: 'database',
+                title: 'Firebase',
+                icon: '🔥',
+                color: '#ffca28',
+                description: 'Google platform providing backend services including real-time database, authentication, and cloud storage.',
+                tags: ['BaaS', 'Real-time', 'NoSQL', 'Google']
+            },
+            {
+                category: 'devops',
+                title: 'Kubernetes',
+                icon: '☸️',
+                color: '#326ce5',
+                description: 'Container orchestration platform automating deployment, scaling, and management of containerized applications.',
+                tags: ['Orchestration', 'Containers', 'K8s', 'Scaling']
+            },
+            {
+                category: 'devops',
+                title: 'Terraform',
+                icon: '🏗️',
+                color: '#7b42bc',
+                description: 'Infrastructure as Code tool for building, changing, and versioning infrastructure safely and efficiently.',
+                tags: ['IaC', 'Automation', 'Cloud', 'Provisioning']
+            },
+            {
+                category: 'devops',
+                title: 'Nginx',
+                icon: '🌐',
+                color: '#009639',
+                description: 'High-performance web server, reverse proxy, and load balancer known for stability and low resource consumption.',
+                tags: ['Web Server', 'Proxy', 'Load Balancer', 'HTTP']
+            },
+            {
+                category: 'devops',
+                title: 'Linux',
+                icon: '🐧',
+                color: '#fcc624',
+                description: 'Open-source operating system kernel widely used in servers, containers, and development environments.',
+                tags: ['OS', 'Unix', 'Command Line', 'Server']
+            },
+            {
+                category: 'backend',
+                title: 'Testing (Jest/Mocha)',
+                icon: '🧪',
+                color: '#99425b',
+                description: 'Automated testing frameworks ensuring code quality through unit, integration, and end-to-end testing.',
+                tags: ['Testing', 'TDD', 'Unit Tests', 'Quality']
+            },
+            {
+                category: 'frontend',
+                title: 'Next.js',
+                icon: '▲',
+                color: '#000000',
+                description: 'React framework enabling server-side rendering, static site generation, and optimized performance out of the box.',
+                tags: ['React', 'SSR', 'Full-stack', 'SEO']
+            },
+            {
+                category: 'backend',
+                title: 'WebSockets',
+                icon: '🔌',
+                color: '#010101',
+                description: 'Protocol providing full-duplex communication channels over a single TCP connection for real-time applications.',
+                tags: ['Real-time', 'Bi-directional', 'Protocol', 'Chat']
+            },
+            {
+                category: 'backend',
+                title: 'OAuth/JWT',
+                icon: '🔐',
+                color: '#000000',
+                description: 'Authentication and authorization protocols for securing APIs and enabling secure token-based authentication.',
+                tags: ['Auth', 'Security', 'Token', 'API']
+            },
+            {
+                category: 'soft',
+                title: 'Agile/Scrum',
+                icon: '🏃',
+                color: '#ff6b6b',
+                description: 'Iterative project management methodology emphasizing flexibility, collaboration, and continuous improvement.',
+                tags: ['Methodology', 'Sprint', 'Collaboration', 'Iterative']
+            },
+            {
+                category: 'soft',
+                title: 'Code Review',
+                icon: '👀',
+                color: '#4ecdc4',
+                description: 'Systematic examination of code by peers to improve quality, catch bugs, and share knowledge across teams.',
+                tags: ['Quality', 'Collaboration', 'Best Practices', 'Peer Review']
+            },
+            {
+                category: 'devops',
+                title: 'Monitoring/Logging',
+                icon: '📊',
+                color: '#ff9f1c',
+                description: 'Tools and practices for tracking application performance, errors, and system health in production environments.',
+                tags: ['Observability', 'Debugging', 'Performance', 'Analytics']
+            },
+            {
+                category: 'frontend',
+                title: 'Sass/SCSS',
+                icon: '💅',
+                color: '#cc6699',
+                description: 'CSS preprocessor adding features like variables, nesting, and mixins for more maintainable stylesheets.',
+                tags: ['CSS', 'Preprocessor', 'Variables', 'Nesting']
+            },
+            {
+                category: 'backend',
+                title: 'Message Queues',
+                icon: '📬',
+                color: '#ff6348',
+                description: 'Asynchronous communication pattern using queues like RabbitMQ or Kafka for decoupled, scalable systems.',
+                tags: ['Async', 'RabbitMQ', 'Kafka', 'Decoupling']
+            },
+            {
+                category: 'frontend',
+                title: 'Bootstrap',
+                icon: '🅱️',
+                color: '#7952b3',
+                description: 'Popular CSS framework with pre-built components and responsive grid system for rapid UI development.',
+                tags: ['CSS', 'Components', 'Responsive', 'Grid']
+            },
+            {
+                category: 'frontend',
+                title: 'jQuery',
+                icon: '🔵',
+                color: '#0769ad',
+                description: 'Fast, small JavaScript library simplifying HTML document traversal, event handling, and AJAX interactions.',
+                tags: ['JavaScript', 'DOM', 'AJAX', 'Library']
+            },
+            {
+                category: 'frontend',
+                title: 'Responsive Design',
+                icon: '📱',
+                color: '#2ecc71',
+                description: 'Approach to web design making pages render well on various devices and screen sizes with fluid layouts.',
+                tags: ['Mobile', 'Adaptive', 'Media Queries', 'UX']
+            },
+            {
+                category: 'frontend',
+                title: 'Progressive Web Apps',
+                icon: '📲',
+                color: '#5a0fc8',
+                description: 'Web applications using modern APIs to deliver app-like experiences with offline capability and push notifications.',
+                tags: ['PWA', 'Service Workers', 'Offline', 'Mobile']
+            },
+            {
+                category: 'backend',
+                title: 'Spring Boot',
+                icon: '🍃',
+                color: '#6db33f',
+                description: 'Java-based framework for creating stand-alone, production-grade Spring applications with minimal configuration.',
+                tags: ['Java', 'Spring', 'Enterprise', 'Framework']
+            },
+            {
+                category: 'backend',
+                title: 'ASP.NET Core',
+                icon: '🔷',
+                color: '#512bd4',
+                description: 'Cross-platform, high-performance framework for building modern, cloud-based, internet-connected applications.',
+                tags: ['C#', '.NET', 'Microsoft', 'Web API']
+            },
+            {
+                category: 'backend',
+                title: 'Go (Golang)',
+                icon: '🐹',
+                color: '#00add8',
+                description: 'Statically typed, compiled language designed at Google for efficient, concurrent, and scalable systems.',
+                tags: ['Google', 'Concurrent', 'Performance', 'Compiled']
+            },
+            {
+                category: 'backend',
+                title: 'Rust',
+                icon: '🦀',
+                color: '#000000',
+                description: 'Systems programming language focused on safety, speed, and concurrency without garbage collection.',
+                tags: ['Systems', 'Memory Safe', 'Performance', 'Concurrent']
+            },
+            {
+                category: 'database',
+                title: 'SQLite',
+                icon: '💾',
+                color: '#003b57',
+                description: 'Self-contained, serverless SQL database engine widely used in embedded systems and mobile applications.',
+                tags: ['SQL', 'Embedded', 'Lightweight', 'Mobile']
+            },
+            {
+                category: 'database',
+                title: 'DynamoDB',
+                icon: '⚡',
+                color: '#4053d6',
+                description: 'Fully managed NoSQL database service by AWS offering fast, predictable performance with seamless scalability.',
+                tags: ['NoSQL', 'AWS', 'Serverless', 'Key-Value']
+            },
+            {
+                category: 'database',
+                title: 'Cassandra',
+                icon: '🗂️',
+                color: '#1287b1',
+                description: 'Distributed NoSQL database designed to handle large amounts of data across many commodity servers.',
+                tags: ['NoSQL', 'Distributed', 'High Availability', 'Big Data']
+            },
+            {
+                category: 'database',
+                title: 'ORM (Sequelize/Prisma)',
+                icon: '🔗',
+                color: '#2d3748',
+                description: 'Object-Relational Mapping tools converting data between incompatible type systems in object-oriented languages.',
+                tags: ['Database', 'Abstraction', 'TypeScript', 'Models']
+            },
+            {
+                category: 'devops',
+                title: 'GitHub Actions',
+                icon: '⚙️',
+                color: '#2088ff',
+                description: 'CI/CD platform integrated with GitHub for automating build, test, and deployment workflows.',
+                tags: ['CI/CD', 'Automation', 'GitHub', 'Workflows']
+            },
+            {
+                category: 'devops',
+                title: 'GitLab CI',
+                icon: '🦊',
+                color: '#fc6d26',
+                description: 'Built-in continuous integration and deployment tool in GitLab for automating software delivery pipelines.',
+                tags: ['CI/CD', 'DevOps', 'Automation', 'Pipeline']
+            },
+            {
+                category: 'devops',
+                title: 'Ansible',
+                icon: '🤖',
+                color: '#ee0000',
+                description: 'Agentless automation tool for configuration management, application deployment, and task automation.',
+                tags: ['Automation', 'Configuration', 'IaC', 'Orchestration']
+            },
+            {
+                category: 'devops',
+                title: 'Prometheus',
+                icon: '🔥',
+                color: '#e6522c',
+                description: 'Open-source monitoring and alerting toolkit with powerful query language for time-series data.',
+                tags: ['Monitoring', 'Metrics', 'Alerting', 'Time-series']
+            },
+            {
+                category: 'devops',
+                title: 'Grafana',
+                icon: '📈',
+                color: '#f46800',
+                description: 'Analytics and monitoring platform for visualizing metrics, logs, and traces from multiple data sources.',
+                tags: ['Visualization', 'Dashboards', 'Monitoring', 'Analytics']
+            },
+            {
+                category: 'backend',
+                title: 'Serverless',
+                icon: '☁️',
+                color: '#fd4949',
+                description: 'Cloud computing model where providers manage infrastructure, allowing developers to focus on code execution.',
+                tags: ['Lambda', 'FaaS', 'Cloud', 'Auto-scale']
+            },
+            {
+                category: 'backend',
+                title: 'API Gateway',
+                icon: '🚪',
+                color: '#ff6b6b',
+                description: 'Server acting as API front-end, handling requests, enforcing policies, and routing to backend services.',
+                tags: ['API', 'Proxy', 'Routing', 'Rate Limiting']
+            },
+            {
+                category: 'backend',
+                title: 'Caching Strategies',
+                icon: '⚡',
+                color: '#feca57',
+                description: 'Techniques for storing frequently accessed data in memory to improve application performance and reduce load.',
+                tags: ['Performance', 'Redis', 'CDN', 'Optimization']
+            },
+            {
+                category: 'frontend',
+                title: 'Web Accessibility',
+                icon: '♿',
+                color: '#0077b6',
+                description: 'Designing and developing websites usable by people with disabilities, following WCAG guidelines.',
+                tags: ['A11y', 'WCAG', 'Inclusive', 'UX']
+            },
+            {
+                category: 'frontend',
+                title: 'SEO Optimization',
+                icon: '🔍',
+                color: '#4285f4',
+                description: 'Practices improving website visibility in search engines through technical optimization and content strategy.',
+                tags: ['Search', 'Rankings', 'Meta Tags', 'Performance']
+            },
+            {
+                category: 'soft',
+                title: 'Time Management',
+                icon: '⏰',
+                color: '#e74c3c',
+                description: 'Organizing and planning time effectively to increase productivity and meet project deadlines efficiently.',
+                tags: ['Productivity', 'Planning', 'Prioritization', 'Deadlines']
+            },
+            {
+                category: 'soft',
+                title: 'Technical Writing',
+                icon: '📝',
+                color: '#3498db',
+                description: 'Creating clear documentation, API guides, and technical content for developers and end-users.',
+                tags: ['Documentation', 'API Docs', 'Guides', 'Communication']
+            },
+            {
+                category: 'soft',
+                title: 'Mentoring',
+                icon: '👨‍🏫',
+                color: '#9b59b6',
+                description: 'Guiding and supporting less experienced developers through knowledge sharing and professional development.',
+                tags: ['Leadership', 'Teaching', 'Growth', 'Knowledge Transfer']
+            },
+            {
+                category: 'backend',
+                title: 'Design Patterns',
+                icon: '🎯',
+                color: '#34495e',
+                description: 'Reusable solutions to common software design problems including Singleton, Factory, Observer, and MVC patterns.',
+                tags: ['Architecture', 'OOP', 'Best Practices', 'Software Design']
+            },
+            {
+                category: 'devops',
+                title: 'Load Balancing',
+                icon: '⚖️',
+                color: '#16a085',
+                description: 'Distributing network traffic across multiple servers to ensure reliability and optimize resource utilization.',
+                tags: ['Scalability', 'High Availability', 'Performance', 'Nginx']
+            },
+            {
+                category: 'backend',
+                title: 'Data Structures',
+                icon: '🌳',
+                color: '#27ae60',
+                description: 'Organizing and storing data efficiently using arrays, linked lists, trees, graphs, hash tables, and more.',
+                tags: ['Algorithms', 'Arrays', 'Trees', 'Hash Tables']
+            },
+            {
+                category: 'backend',
+                title: 'Algorithms',
+                icon: '🧮',
+                color: '#2980b9',
+                description: 'Step-by-step procedures for solving problems including sorting, searching, and optimization techniques.',
+                tags: ['Problem Solving', 'Complexity', 'Optimization', 'Logic']
+            },
+            {
+                category: 'frontend',
+                title: 'Svelte',
+                icon: '🧡',
+                color: '#ff3e00',
+                description: 'Radical new approach to building user interfaces, compiling components to efficient imperative code.',
+                tags: ['Framework', 'Compiler', 'Reactive', 'Lightweight']
+            },
+            {
+                category: 'frontend',
+                title: 'Material UI',
+                icon: '🎨',
+                color: '#0081cb',
+                description: 'React component library implementing Google Material Design for building elegant user interfaces.',
+                tags: ['React', 'Components', 'Design System', 'UI']
+            },
+            {
+                category: 'frontend',
+                title: 'Vite',
+                icon: '⚡',
+                color: '#646cff',
+                description: 'Next-generation frontend build tool providing fast development server and optimized production builds.',
+                tags: ['Build Tool', 'Fast', 'HMR', 'ES Modules']
+            },
+            {
+                category: 'frontend',
+                title: 'Figma/Design',
+                icon: '🎨',
+                color: '#f24e1e',
+                description: 'Understanding design principles and tools like Figma for UI/UX collaboration and implementation.',
+                tags: ['UI/UX', 'Design', 'Prototyping', 'Collaboration']
+            },
+            {
+                category: 'backend',
+                title: 'FastAPI',
+                icon: '⚡',
+                color: '#009688',
+                description: 'Modern, fast Python web framework for building APIs with automatic interactive documentation.',
+                tags: ['Python', 'API', 'Async', 'Type Hints']
+            },
+            {
+                category: 'backend',
+                title: 'Flask',
+                icon: '🧪',
+                color: '#000000',
+                description: 'Lightweight Python web framework providing tools and libraries for building web applications quickly.',
+                tags: ['Python', 'Micro-framework', 'WSGI', 'Flexible']
+            },
+            {
+                category: 'backend',
+                title: 'Nest.js',
+                icon: '🐱',
+                color: '#e0234e',
+                description: 'Progressive Node.js framework for building efficient, scalable server-side applications with TypeScript.',
+                tags: ['Node.js', 'TypeScript', 'Enterprise', 'Modular']
+            },
+            {
+                category: 'backend',
+                title: 'Socket.io',
+                icon: '🔌',
+                color: '#010101',
+                description: 'Library enabling real-time, bidirectional, event-based communication between clients and servers.',
+                tags: ['Real-time', 'WebSockets', 'Events', 'Chat']
+            },
+            {
+                category: 'backend',
+                title: 'Swagger/OpenAPI',
+                icon: '📋',
+                color: '#85ea2d',
+                description: 'Specification for documenting RESTful APIs with interactive documentation and code generation.',
+                tags: ['API', 'Documentation', 'Specification', 'REST']
+            },
+            {
+                category: 'database',
+                title: 'Neo4j',
+                icon: '🕸️',
+                color: '#008cc1',
+                description: 'Graph database management system optimized for storing and querying highly connected data.',
+                tags: ['NoSQL', 'Graph', 'Relationships', 'Cypher']
+            },
+            {
+                category: 'database',
+                title: 'CouchDB',
+                icon: '🛋️',
+                color: '#e42528',
+                description: 'NoSQL database using JSON documents with MapReduce queries and multi-master replication.',
+                tags: ['NoSQL', 'Document', 'JSON', 'Distributed']
+            },
+            {
+                category: 'database',
+                title: 'Time-Series DB',
+                icon: '⏱️',
+                color: '#ff6b6b',
+                description: 'Specialized databases like InfluxDB optimized for handling time-stamped or time-series data.',
+                tags: ['InfluxDB', 'Metrics', 'IoT', 'Analytics']
+            },
+            {
+                category: 'database',
+                title: 'Database Indexing',
+                icon: '🗂️',
+                color: '#4a5568',
+                description: 'Creating data structures to improve speed of data retrieval operations on database tables.',
+                tags: ['Performance', 'Optimization', 'B-Tree', 'Query']
+            },
+            {
+                category: 'devops',
+                title: 'Apache',
+                icon: '🪶',
+                color: '#d22128',
+                description: 'Popular open-source HTTP server for modern operating systems including Unix and Windows.',
+                tags: ['Web Server', 'HTTP', 'Modules', 'Hosting']
+            },
+            {
+                category: 'devops',
+                title: 'Vagrant',
+                icon: '💠',
+                color: '#1563ff',
+                description: 'Tool for building and managing virtual machine environments in single workflow configuration.',
+                tags: ['VM', 'Development', 'Environment', 'Provisioning']
+            },
+            {
+                category: 'devops',
+                title: 'ELK Stack',
+                icon: '📊',
+                color: '#005571',
+                description: 'Elasticsearch, Logstash, and Kibana for centralized logging, searching, and visualizing log data.',
+                tags: ['Logging', 'Analytics', 'Visualization', 'Search']
+            },
+            {
+                category: 'devops',
+                title: 'CircleCI',
+                icon: '🔄',
+                color: '#343434',
+                description: 'Continuous integration and delivery platform automating build, test, and deployment workflows.',
+                tags: ['CI/CD', 'Automation', 'Pipeline', 'Cloud']
+            },
+            {
+                category: 'devops',
+                title: 'Cloudflare',
+                icon: '🌩️',
+                color: '#f38020',
+                description: 'Content delivery network and DDoS protection service optimizing website performance and security.',
+                tags: ['CDN', 'Security', 'DNS', 'Performance']
+            },
+            {
+                category: 'backend',
+                title: 'Postman',
+                icon: '📮',
+                color: '#ff6c37',
+                description: 'Collaboration platform for API development with tools for testing, documenting, and monitoring APIs.',
+                tags: ['API', 'Testing', 'Development', 'Tools']
+            },
+            {
+                category: 'backend',
+                title: 'RabbitMQ',
+                icon: '🐰',
+                color: '#ff6600',
+                description: 'Open-source message broker software implementing Advanced Message Queuing Protocol (AMQP).',
+                tags: ['Message Queue', 'AMQP', 'Async', 'Messaging']
+            },
+            {
+                category: 'backend',
+                title: 'Apache Kafka',
+                icon: '📨',
+                color: '#231f20',
+                description: 'Distributed event streaming platform for high-performance data pipelines and streaming analytics.',
+                tags: ['Streaming', 'Events', 'Big Data', 'Real-time']
+            },
+            {
+                category: 'backend',
+                title: 'gRPC',
+                icon: '⚙️',
+                color: '#244c5a',
+                description: 'High-performance RPC framework using Protocol Buffers for efficient service-to-service communication.',
+                tags: ['RPC', 'Protobuf', 'Microservices', 'Performance']
+            },
+            {
+                category: 'backend',
+                title: 'XML/JSON',
+                icon: '📄',
+                color: '#f89820',
+                description: 'Data interchange formats for structuring and transmitting data between systems and applications.',
+                tags: ['Data Format', 'Serialization', 'API', 'Parsing']
+            },
+            {
+                category: 'frontend',
+                title: 'Electron',
+                icon: '💻',
+                color: '#47848f',
+                description: 'Framework for building cross-platform desktop applications with web technologies (HTML, CSS, JS).',
+                tags: ['Desktop', 'Cross-platform', 'Node.js', 'Apps']
+            },
+            {
+                category: 'frontend',
+                title: 'React Native',
+                icon: '📱',
+                color: '#61dafb',
+                description: 'Framework for building native mobile applications using React and JavaScript for iOS and Android.',
+                tags: ['Mobile', 'React', 'Cross-platform', 'Native']
+            },
+            {
+                category: 'frontend',
+                title: 'Flutter',
+                icon: '🦋',
+                color: '#02569b',
+                description: 'Google UI toolkit for building natively compiled applications for mobile, web, and desktop from single codebase.',
+                tags: ['Mobile', 'Dart', 'Cross-platform', 'Google']
+            },
+            {
+                category: 'frontend',
+                title: 'WebAssembly',
+                icon: '🔧',
+                color: '#654ff0',
+                description: 'Binary instruction format enabling near-native performance for web applications written in multiple languages.',
+                tags: ['WASM', 'Performance', 'Binary', 'Low-level']
+            },
+            {
+                category: 'soft',
+                title: 'Remote Work',
+                icon: '🏠',
+                color: '#1abc9c',
+                description: 'Effectively collaborating, communicating, and delivering results in distributed and remote team environments.',
+                tags: ['Collaboration', 'Communication', 'Async', 'Tools']
+            },
+            {
+                category: 'soft',
+                title: 'Conflict Resolution',
+                icon: '🤝',
+                color: '#e67e22',
+                description: 'Managing disagreements and finding constructive solutions in team settings and code reviews.',
+                tags: ['Teamwork', 'Communication', 'Empathy', 'Leadership']
+            },
+            {
+                category: 'soft',
+                title: 'Critical Thinking',
+                icon: '🤔',
+                color: '#8e44ad',
+                description: 'Analyzing situations objectively, evaluating trade-offs, and making informed technical decisions.',
+                tags: ['Analysis', 'Decision Making', 'Logic', 'Reasoning']
+            },
+            {
+                category: 'backend',
+                title: 'Rate Limiting',
+                icon: '🚦',
+                color: '#e74c3c',
+                description: 'Controlling traffic to APIs and services by limiting request frequency to prevent abuse and ensure stability.',
+                tags: ['API', 'Security', 'Throttling', 'Performance']
+            },
+            {
+                category: 'devops',
+                title: 'Backup & Recovery',
+                icon: '💾',
+                color: '#27ae60',
+                description: 'Strategies and tools for data backup, disaster recovery, and business continuity planning.',
+                tags: ['Data Protection', 'Disaster Recovery', 'Resilience', 'Strategy']
+            },
+            {
+                category: 'backend',
+                title: 'API Versioning',
+                icon: '🔢',
+                color: '#3498db',
+                description: 'Managing multiple API versions to maintain backward compatibility while introducing new features.',
+                tags: ['API', 'Compatibility', 'Deprecation', 'Migration']
+            },
+            {
+                category: 'frontend',
+                title: 'Three.js',
+                icon: '🎮',
+                color: '#000000',
+                description: 'JavaScript library for creating and displaying 3D computer graphics in web browsers using WebGL.',
+                tags: ['3D', 'WebGL', 'Graphics', 'Animation']
+            },
+            {
+                category: 'frontend',
+                title: 'D3.js',
+                icon: '📊',
+                color: '#f9a03c',
+                description: 'JavaScript library for producing dynamic, interactive data visualizations using SVG, HTML, and CSS.',
+                tags: ['Data Visualization', 'Charts', 'SVG', 'Interactive']
+            },
+            {
+                category: 'frontend',
+                title: 'Styled Components',
+                icon: '💅',
+                color: '#db7093',
+                description: 'CSS-in-JS library allowing component-level styling in React with dynamic styling capabilities.',
+                tags: ['React', 'CSS-in-JS', 'Styling', 'Components']
+            },
+            {
+                category: 'frontend',
+                title: 'Storybook',
+                icon: '📚',
+                color: '#ff4785',
+                description: 'Development environment for UI components enabling isolated component development and testing.',
+                tags: ['UI', 'Components', 'Testing', 'Documentation']
+            },
+            {
+                category: 'frontend',
+                title: 'Babel',
+                icon: '🔄',
+                color: '#f9dc3e',
+                description: 'JavaScript compiler converting modern JavaScript/JSX into backwards-compatible versions for older browsers.',
+                tags: ['Transpiler', 'ES6+', 'Compiler', 'Build Tool']
+            },
+            {
+                category: 'frontend',
+                title: 'ESLint',
+                icon: '✅',
+                color: '#4b32c3',
+                description: 'Pluggable linting utility for JavaScript identifying and fixing code quality and style issues.',
+                tags: ['Linting', 'Code Quality', 'Standards', 'Static Analysis']
+            },
+            {
+                category: 'frontend',
+                title: 'Prettier',
+                icon: '✨',
+                color: '#f7b93e',
+                description: 'Opinionated code formatter ensuring consistent code style across teams and projects.',
+                tags: ['Formatting', 'Code Style', 'Automation', 'Consistency']
+            },
+            {
+                category: 'backend',
+                title: 'Celery',
+                icon: '🥬',
+                color: '#37814a',
+                description: 'Distributed task queue for Python handling asynchronous job processing and scheduling.',
+                tags: ['Python', 'Task Queue', 'Async', 'Distributed']
+            },
+            {
+                category: 'backend',
+                title: 'Laravel',
+                icon: '🔴',
+                color: '#ff2d20',
+                description: 'Elegant PHP web application framework with expressive syntax for web artisans.',
+                tags: ['PHP', 'MVC', 'Eloquent', 'Full-stack']
+            },
+            {
+                category: 'backend',
+                title: 'Symfony',
+                icon: '⬛',
+                color: '#000000',
+                description: 'PHP framework for web applications and reusable PHP components with modular architecture.',
+                tags: ['PHP', 'Framework', 'Components', 'Enterprise']
+            },
+            {
+                category: 'backend',
+                title: 'Deno',
+                icon: '🦕',
+                color: '#000000',
+                description: 'Secure runtime for JavaScript and TypeScript built on V8, Rust, and Tokio with modern features.',
+                tags: ['JavaScript', 'TypeScript', 'Runtime', 'Secure']
+            },
+            {
+                category: 'backend',
+                title: 'CORS',
+                icon: '🌐',
+                color: '#ff6b6b',
+                description: 'Cross-Origin Resource Sharing mechanism allowing controlled access to resources from different domains.',
+                tags: ['Security', 'HTTP', 'Browser', 'API']
+            },
+            {
+                category: 'backend',
+                title: 'Session Management',
+                icon: '🔐',
+                color: '#6c5ce7',
+                description: 'Maintaining user state and authentication across multiple requests in web applications.',
+                tags: ['Authentication', 'State', 'Cookies', 'Security']
+            },
+            {
+                category: 'backend',
+                title: 'Middleware',
+                icon: '🔗',
+                color: '#fdcb6e',
+                description: 'Software layer providing common services between applications, handling requests before reaching endpoints.',
+                tags: ['Architecture', 'Request Pipeline', 'Processing', 'Logic']
+            },
+            {
+                category: 'database',
+                title: 'Sharding',
+                icon: '🔪',
+                color: '#e84393',
+                description: 'Database partitioning technique distributing data across multiple machines for horizontal scaling.',
+                tags: ['Scaling', 'Distributed', 'Partitioning', 'Performance']
+            },
+            {
+                category: 'database',
+                title: 'Replication',
+                icon: '📋',
+                color: '#00b894',
+                description: 'Copying data from one database server to another for redundancy, availability, and load distribution.',
+                tags: ['High Availability', 'Backup', 'Redundancy', 'Failover']
+            },
+            {
+                category: 'database',
+                title: 'Data Migration',
+                icon: '🚚',
+                color: '#0984e3',
+                description: 'Moving data between systems, formats, or storage types while maintaining integrity and consistency.',
+                tags: ['ETL', 'Transfer', 'Transformation', 'Schema']
+            },
+            {
+                category: 'database',
+                title: 'ACID Properties',
+                icon: '⚛️',
+                color: '#6c5ce7',
+                description: 'Database transaction properties ensuring Atomicity, Consistency, Isolation, and Durability.',
+                tags: ['Transactions', 'Database', 'Consistency', 'Reliability']
+            },
+            {
+                category: 'devops',
+                title: 'Helm',
+                icon: '⚓',
+                color: '#0f1689',
+                description: 'Package manager for Kubernetes simplifying deployment and management of applications.',
+                tags: ['Kubernetes', 'Package Manager', 'Deployment', 'Charts']
+            },
+            {
+                category: 'devops',
+                title: 'Istio',
+                icon: '🕸️',
+                color: '#466bb0',
+                description: 'Service mesh providing traffic management, security, and observability for microservices.',
+                tags: ['Service Mesh', 'Microservices', 'Networking', 'Security']
+            },
+            {
+                category: 'devops',
+                title: 'Consul',
+                icon: '💜',
+                color: '#dc477d',
+                description: 'Service networking platform providing service discovery, configuration, and segmentation.',
+                tags: ['Service Discovery', 'Configuration', 'Networking', 'HashiCorp']
+            },
+            {
+                category: 'devops',
+                title: 'Splunk',
+                icon: '🔍',
+                color: '#000000',
+                description: 'Platform for searching, monitoring, and analyzing machine-generated data via web interface.',
+                tags: ['Logging', 'Analytics', 'Monitoring', 'Search']
+            },
+            {
+                category: 'devops',
+                title: 'New Relic',
+                icon: '📈',
+                color: '#008c99',
+                description: 'Application performance monitoring providing real-time insights into software performance.',
+                tags: ['APM', 'Monitoring', 'Performance', 'Analytics']
+            },
+            {
+                category: 'devops',
+                title: 'DataDog',
+                icon: '🐕',
+                color: '#632ca6',
+                description: 'Monitoring and analytics platform for cloud-scale applications providing full-stack observability.',
+                tags: ['Monitoring', 'APM', 'Logs', 'Metrics']
+            },
+            {
+                category: 'devops',
+                title: 'CloudFormation',
+                icon: '☁️',
+                color: '#ff9900',
+                description: 'AWS service for modeling and provisioning cloud resources using infrastructure as code.',
+                tags: ['AWS', 'IaC', 'Provisioning', 'Templates']
+            },
+            {
+                category: 'devops',
+                title: 'Blue-Green Deploy',
+                icon: '🔵',
+                color: '#0abde3',
+                description: 'Deployment strategy maintaining two identical environments for zero-downtime releases.',
+                tags: ['Deployment', 'Zero Downtime', 'Strategy', 'Release']
+            },
+            {
+                category: 'devops',
+                title: 'Canary Deploy',
+                icon: '🐤',
+                color: '#feca57',
+                description: 'Gradual rollout strategy releasing updates to subset of users before full deployment.',
+                tags: ['Deployment', 'Progressive', 'Risk Mitigation', 'Testing']
+            },
+            {
+                category: 'backend',
+                title: 'SOLID Principles',
+                icon: '🏗️',
+                color: '#5f27cd',
+                description: 'Five design principles making software more understandable, flexible, and maintainable.',
+                tags: ['OOP', 'Design', 'Best Practices', 'Architecture']
+            },
+            {
+                category: 'backend',
+                title: 'Clean Code',
+                icon: '✨',
+                color: '#00d2d3',
+                description: 'Writing readable, maintainable code following naming conventions and software craftsmanship principles.',
+                tags: ['Best Practices', 'Readability', 'Maintainability', 'Quality']
+            },
+            {
+                category: 'backend',
+                title: 'TDD/BDD',
+                icon: '🧪',
+                color: '#ff6348',
+                description: 'Test-Driven and Behavior-Driven Development methodologies writing tests before implementation.',
+                tags: ['Testing', 'Methodology', 'Quality', 'Development']
+            },
+            {
+                category: 'backend',
+                title: 'Continuous Testing',
+                icon: '♻️',
+                color: '#1dd1a1',
+                description: 'Automated testing throughout development lifecycle ensuring quality at every stage.',
+                tags: ['Testing', 'Automation', 'CI/CD', 'Quality Assurance']
+            },
+            {
+                category: 'soft',
+                title: 'Adaptability',
+                icon: '🔄',
+                color: '#48dbfb',
+                description: 'Flexibility in learning new technologies and adjusting to changing project requirements.',
+                tags: ['Learning', 'Flexibility', 'Growth', 'Change Management']
+            },
+            {
+                category: 'soft',
+                title: 'Leadership',
+                icon: '👑',
+                color: '#ffd700',
+                description: 'Guiding teams, making technical decisions, and inspiring others toward project goals.',
+                tags: ['Management', 'Decision Making', 'Inspiration', 'Team Building']
+            },
+            {
+                category: 'soft',
+                title: 'Estimation',
+                icon: '📏',
+                color: '#ff7979',
+                description: 'Accurately estimating time and effort required for development tasks and projects.',
+                tags: ['Planning', 'Project Management', 'Accuracy', 'Forecasting']
+            },
+            {
+                category: 'frontend',
+                title: 'Ionic',
+                icon: '⚡',
+                color: '#3880ff',
+                description: 'Cross-platform framework for building mobile and desktop apps using web technologies.',
+                tags: ['Mobile', 'Hybrid', 'Cross-platform', 'Angular']
+            },
+            {
+                category: 'frontend',
+                title: 'Alpine.js',
+                icon: '🏔️',
+                color: '#8bc0d0',
+                description: 'Lightweight JavaScript framework offering reactive and declarative nature at minimal cost.',
+                tags: ['JavaScript', 'Lightweight', 'Reactive', 'Simple']
+            },
+            {
+                category: 'frontend',
+                title: 'Preact',
+                icon: '⚛️',
+                color: '#673ab8',
+                description: 'Fast 3kB alternative to React with the same modern API and compatibility.',
+                tags: ['React', 'Lightweight', 'Performance', 'Alternative']
+            },
+            {
+                category: 'frontend',
+                title: 'Lit',
+                icon: '🔥',
+                color: '#324fff',
+                description: 'Simple library for building fast, lightweight web components with reactive state.',
+                tags: ['Web Components', 'Lightweight', 'Reactive', 'Custom Elements']
+            },
+            {
+                category: 'frontend',
+                title: 'Gatsby',
+                icon: '🟣',
+                color: '#663399',
+                description: 'React-based framework for building fast, secure websites and apps with GraphQL.',
+                tags: ['React', 'Static Site', 'GraphQL', 'JAMstack']
+            },
+            {
+                category: 'frontend',
+                title: 'Nuxt.js',
+                icon: '💚',
+                color: '#00dc82',
+                description: 'Vue.js framework for building server-side rendered applications and static websites.',
+                tags: ['Vue.js', 'SSR', 'Full-stack', 'Framework']
+            },
+            {
+                category: 'frontend',
+                title: 'Astro',
+                icon: '🚀',
+                color: '#ff5d01',
+                description: 'Modern static site builder delivering zero JavaScript by default for faster websites.',
+                tags: ['Static Site', 'Performance', 'Multi-framework', 'Modern']
+            },
+            {
+                category: 'frontend',
+                title: 'Chart.js',
+                icon: '📈',
+                color: '#ff6384',
+                description: 'Simple yet flexible JavaScript charting library for creating responsive visualizations.',
+                tags: ['Charts', 'Visualization', 'Canvas', 'Responsive']
+            },
+            {
+                category: 'backend',
+                title: 'Elixir/Phoenix',
+                icon: '💧',
+                color: '#4e2a8e',
+                description: 'Functional language and framework built on Erlang VM for scalable, maintainable applications.',
+                tags: ['Functional', 'Concurrent', 'Real-time', 'Scalable']
+            },
+            {
+                category: 'backend',
+                title: 'Scala',
+                icon: '🔴',
+                color: '#dc322f',
+                description: 'Multi-paradigm language combining object-oriented and functional programming on JVM.',
+                tags: ['JVM', 'Functional', 'OOP', 'Type-safe']
+            },
+            {
+                category: 'backend',
+                title: 'Kotlin',
+                icon: '🟣',
+                color: '#7f52ff',
+                description: 'Modern, concise programming language for JVM, Android, and multiplatform development.',
+                tags: ['JVM', 'Android', 'Multiplatform', 'Modern']
+            },
+            {
+                category: 'backend',
+                title: 'Swift',
+                icon: '🦅',
+                color: '#fa7343',
+                description: 'Powerful programming language by Apple for iOS, macOS, and other Apple platforms.',
+                tags: ['Apple', 'iOS', 'macOS', 'Mobile']
+            },
+            {
+                category: 'backend',
+                title: 'Haskell',
+                icon: '🎩',
+                color: '#5d4f85',
+                description: 'Pure functional programming language with strong static typing and lazy evaluation.',
+                tags: ['Functional', 'Pure', 'Type-safe', 'Academic']
+            },
+            {
+                category: 'backend',
+                title: 'Perl',
+                icon: '🐪',
+                color: '#39457e',
+                description: 'High-level language excellent for text manipulation, system administration, and web development.',
+                tags: ['Scripting', 'Text Processing', 'Legacy', 'Regex']
+            },
+            {
+                category: 'backend',
+                title: 'C/C++',
+                icon: '⚙️',
+                color: '#00599c',
+                description: 'Low-level languages for systems programming, game development, and performance-critical applications.',
+                tags: ['Systems', 'Performance', 'Low-level', 'Compiled']
+            },
+            {
+                category: 'backend',
+                title: 'Lua',
+                icon: '🌙',
+                color: '#000080',
+                description: 'Lightweight scripting language commonly embedded in applications and games.',
+                tags: ['Scripting', 'Embedded', 'Gaming', 'Lightweight']
+            },
+            {
+                category: 'backend',
+                title: 'Assembly',
+                icon: '🔩',
+                color: '#6e4c13',
+                description: 'Low-level programming language with strong correspondence to machine code instructions.',
+                tags: ['Low-level', 'Machine Code', 'Performance', 'Hardware']
+            },
+            {
+                category: 'backend',
+                title: 'Error Handling',
+                icon: '⚠️',
+                color: '#f39c12',
+                description: 'Strategies for detecting, managing, and recovering from errors in applications gracefully.',
+                tags: ['Exception', 'Debugging', 'Resilience', 'Best Practices']
+            },
+            {
+                category: 'backend',
+                title: 'Logging',
+                icon: '📝',
+                color: '#95a5a6',
+                description: 'Recording application events, errors, and activities for debugging and monitoring purposes.',
+                tags: ['Debugging', 'Monitoring', 'Tracking', 'Winston']
+            },
+            {
+                category: 'backend',
+                title: 'Pagination',
+                icon: '📄',
+                color: '#3498db',
+                description: 'Dividing large datasets into pages for efficient data retrieval and better user experience.',
+                tags: ['API', 'Performance', 'UX', 'Database']
+            },
+            {
+                category: 'backend',
+                title: 'Web Scraping',
+                icon: '🕷️',
+                color: '#2c3e50',
+                description: 'Extracting data from websites programmatically using tools like Beautiful Soup and Scrapy.',
+                tags: ['Data Extraction', 'Python', 'Automation', 'Parsing']
+            },
+            {
+                category: 'database',
+                title: 'Memcached',
+                icon: '🧠',
+                color: '#1a73e8',
+                description: 'High-performance distributed memory caching system for speeding up dynamic web applications.',
+                tags: ['Cache', 'Memory', 'Performance', 'Distributed']
+            },
+            {
+                category: 'database',
+                title: 'Supabase',
+                icon: '⚡',
+                color: '#3ecf8e',
+                description: 'Open-source Firebase alternative providing database, authentication, and real-time subscriptions.',
+                tags: ['BaaS', 'PostgreSQL', 'Real-time', 'Open Source']
+            },
+            {
+                category: 'database',
+                title: 'PlanetScale',
+                icon: '🌍',
+                color: '#000000',
+                description: 'MySQL-compatible serverless database platform with branching and automatic scaling.',
+                tags: ['MySQL', 'Serverless', 'Branching', 'Scalable']
+            },
+            {
+                category: 'database',
+                title: 'Prisma',
+                icon: '💎',
+                color: '#2d3748',
+                description: 'Next-generation ORM for Node.js and TypeScript with type-safe database access.',
+                tags: ['ORM', 'TypeScript', 'Type-safe', 'Modern']
+            },
+            {
+                category: 'database',
+                title: 'Database Normalization',
+                icon: '🗄️',
+                color: '#7f8c8d',
+                description: 'Organizing database schema to reduce redundancy and improve data integrity.',
+                tags: ['Schema Design', 'Optimization', '3NF', 'Integrity']
+            },
+            {
+                category: 'devops',
+                title: 'Pulumi',
+                icon: '🟣',
+                color: '#8a3391',
+                description: 'Infrastructure as Code using familiar programming languages instead of YAML/JSON.',
+                tags: ['IaC', 'Cloud', 'Programming', 'Multi-cloud']
+            },
+            {
+                category: 'devops',
+                title: 'Nagios',
+                icon: '👁️',
+                color: '#000000',
+                description: 'Open-source monitoring system for infrastructure, networks, and applications.',
+                tags: ['Monitoring', 'Alerting', 'Infrastructure', 'Open Source']
+            },
+            {
+                category: 'devops',
+                title: 'Zabbix',
+                icon: '🔍',
+                color: '#d40000',
+                description: 'Enterprise-class monitoring solution for networks, servers, and cloud services.',
+                tags: ['Monitoring', 'Enterprise', 'Metrics', 'Alerting']
+            },
+            {
+                category: 'devops',
+                title: 'SonarQube',
+                icon: '🔬',
+                color: '#4e9bcd',
+                description: 'Platform for continuous inspection of code quality and security vulnerabilities.',
+                tags: ['Code Quality', 'Static Analysis', 'Security', 'Technical Debt']
+            },
+            {
+                category: 'devops',
+                title: 'Artifactory',
+                icon: '📦',
+                color: '#41bf47',
+                description: 'Universal repository manager for managing and versioning software artifacts.',
+                tags: ['Artifacts', 'Repository', 'Package Manager', 'DevOps']
+            },
+            {
+                category: 'devops',
+                title: 'Nexus',
+                icon: '🔷',
+                color: '#00a0d2',
+                description: 'Repository manager supporting multiple package formats for software supply chain.',
+                tags: ['Repository', 'Artifacts', 'Maven', 'npm']
+            },
+            {
+                category: 'devops',
+                title: 'HashiCorp Vault',
+                icon: '🔒',
+                color: '#000000',
+                description: 'Tool for securely storing and accessing secrets, encryption keys, and sensitive data.',
+                tags: ['Security', 'Secrets', 'Encryption', 'Access Control']
+            },
+            {
+                category: 'devops',
+                title: 'Chaos Engineering',
+                icon: '💥',
+                color: '#e74c3c',
+                description: 'Practice of experimenting on systems to build confidence in resilience to failures.',
+                tags: ['Resilience', 'Testing', 'Failure', 'Netflix']
+            },
+            {
+                category: 'soft',
+                title: 'Pair Programming',
+                icon: '👥',
+                color: '#16a085',
+                description: 'Collaborative practice where two programmers work together at one workstation.',
+                tags: ['Collaboration', 'XP', 'Knowledge Sharing', 'Code Quality']
+            },
+            {
+                category: 'soft',
+                title: 'Stakeholder Management',
+                icon: '🤵',
+                color: '#34495e',
+                description: 'Engaging and managing expectations of project stakeholders and business partners.',
+                tags: ['Communication', 'Management', 'Business', 'Expectations']
+            },
+            {
+                category: 'soft',
+                title: 'Continuous Learning',
+                icon: '📖',
+                color: '#9b59b6',
+                description: 'Commitment to ongoing education and staying current with evolving technologies.',
+                tags: ['Growth', 'Education', 'Self-improvement', 'Trends']
+            },
+            {
+                category: 'backend',
+                title: 'Event-Driven Arch',
+                icon: '📡',
+                color: '#e67e22',
+                description: 'Architectural pattern where system components communicate through events and messages.',
+                tags: ['Architecture', 'Events', 'Async', 'Decoupled']
+            },
+            {
+                category: 'backend',
+                title: 'CQRS',
+                icon: '🔀',
+                color: '#1abc9c',
+                description: 'Command Query Responsibility Segregation pattern separating read and write operations.',
+                tags: ['Architecture', 'Pattern', 'Scalability', 'Separation']
+            },
+            {
+                category: 'backend',
+                title: 'Domain-Driven Design',
+                icon: '🏛️',
+                color: '#8e44ad',
+                description: 'Approach to software development focusing on domain logic and complex business requirements.',
+                tags: ['DDD', 'Architecture', 'Business Logic', 'Modeling']
+            }
+        ];
+
+        const skillsGrid = document.getElementById('skillsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        let currentFilter = 'all';
+
+        function renderSkills(filteredSkills = skills) {
+            skillsGrid.innerHTML = '';
+            
+            if (filteredSkills.length === 0) {
+                noResults.classList.add('show');
+            } else {
+                noResults.classList.remove('show');
+                filteredSkills.forEach(skill => {
+                    const card = document.createElement('div');
+                    card.className = 'skill-card';
+                    card.innerHTML = `
+                        <div class="skill-header">
+                            <div class="skill-icon" style="background: ${skill.color}20;">
+                                ${skill.icon}
+                            </div>
+                            <div class="skill-title">${skill.title}</div>
+                        </div>
+                        <div class="skill-description">${skill.description}</div>
+                        <div class="skill-tags">
+                            ${skill.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    `;
+                    skillsGrid.appendChild(card);
+                });
+            }
+        }
+
+        function filterSkills() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filtered = skills.filter(skill => {
+                const matchesCategory = currentFilter === 'all' || skill.category === currentFilter;
+                const matchesSearch = skill.title.toLowerCase().includes(searchTerm) ||
+                                    skill.description.toLowerCase().includes(searchTerm) ||
+                                    skill.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                return matchesCategory && matchesSearch;
+            });
+            renderSkills(filtered);
+        }
+
+        searchInput.addEventListener('input', filterSkills);
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.category;
+                filterSkills();
+            });
+        });
+
+        renderSkills();
+    </script>
+</body>
+</html>
